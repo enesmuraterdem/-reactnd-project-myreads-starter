@@ -3,13 +3,14 @@ import React from 'react'
 
 class Book extends React.Component {
   state = {
-    shelfValue: ''
+    shelfValue: this.props.data && this.props.data.shelf ? this.props.data.shelf : 'none'
   }
 
   shelveOptions = {
     currentlyReading: 'Currently Reading',
     wantToRead: 'Want to Read',
     read: 'Read',
+    none: 'None',
   }
 
   handleChange(e) {
@@ -36,12 +37,10 @@ class Book extends React.Component {
                 {
                   Object
                     .keys(this.shelveOptions)
-                    .filter(key => key !== data.shelf)
                     .map(key => (
                       <option key={key} value={key}>{this.shelveOptions[key]}</option>
                     ))
                 }
-                <option value="none">None</option>
               </select>
             </div>
           </div>
