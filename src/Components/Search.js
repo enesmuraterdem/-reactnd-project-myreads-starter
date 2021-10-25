@@ -24,9 +24,9 @@ class Search extends Component {
         })
     }
 
-    searchBooks(value) {
+    async searchBooks(value) {
         if (value) {
-            BooksAPI
+            await BooksAPI
                 .search(value)
                 .then(searchResult => {
                     this.setState({
@@ -43,34 +43,24 @@ class Search extends Component {
         }
     }
 
-    onMove(book, shelf) {
-        BooksAPI
-            .update(book, shelf)
-            .then(searchResult => {
-                this.setState({
-                    searchResult: this.state.searchResult.filter(result => result.id !== book.id)
-                })
-            })
-            .catch(err => {
-                console.log('err', err)
-            })
+    getBookShelf(id) {
+        const { currentlyReading, wantToRead, read } = this.props;
+        const myReads = [...currentlyReading, ...wantToRead, ...read];
+
+        const book = myReads.find(book => book.id === id);
+
+        return book && book.shelf;
     }
+
 
     render() {
         const { searchValue, searchResult } = this.state;
+        const { onMove } = this.props;
         return (
             <div className="search-books">
                 <div className="search-books-bar">
                     <Link className="close-search" to="/">Close</Link>
                     <div className="search-books-input-wrapper">
-                        {/*
-                NOTES: The search from BooksAPI is limited to a particular set of search terms.
-                You can find these search terms here:
-                https://github.com/udacity/reactnd-project-myreads-starter/blob/master/SEARCH_TERMS.md
-
-                However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
-                you don't find a specific author or title. Every search is limited by search terms.
-              */}
                         <input
                             type="text"
                             placeholder="Search by title or author"
@@ -85,8 +75,11 @@ class Search extends Component {
                             searchResult.map((book, index) => (
                                 <Book
                                     key={book.id}
-                                    data={book}
-                                    move={(book, shelf) => this.onMove(book, shelf)}
+                                    data={{
+                                        ...book,
+                                        shelf: this.getBookShelf(book.id)
+                                    }}
+                                    move={(book, shelf) => onMove(book, shelf)}
                                 />
                             ))
                         }
